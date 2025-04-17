@@ -1,3 +1,12 @@
+// Debug configuration
+var DEBUG = true;
+
+function debugLog(...args) {
+    if (DEBUG) {
+        console.log('[DEBUG]', ...args);
+    }
+}
+
 // Resource definitions
 var res = {
     background_png: "resource/background.png",
@@ -52,14 +61,21 @@ var WelcomeScene = cc.Scene.extend({
     onEnter: function() {
         this._super();
         var size = cc.director.getWinSize();
+        debugLog('Window Size:', size);
         
         // Background
         var background = new cc.Sprite(res.background_png);
+        debugLog('Background original size:', background.width, 'x', background.height);
+        
         background.setPosition(size.width / 2, size.height / 2);
-        background.setScale(
-            size.width / background.width,
-            size.height / background.height
-        );
+        var scaleX = size.width / background.width;
+        var scaleY = size.height / background.height;
+        debugLog('Background scale factors:', scaleX, scaleY);
+        
+        background.setScale(scaleX, scaleY);
+        debugLog('Background final position:', background.getPosition());
+        debugLog('Background final size:', background.width * scaleX, 'x', background.height * scaleY);
+        
         this.addChild(background);
         
         // Title
@@ -514,11 +530,19 @@ window.onload = function() {
         // Adjust viewport
         cc.view.adjustViewPort(true);
         
-        // Set design resolution
-        cc.view.setDesignResolutionSize(800, 600, cc.ResolutionPolicy.SHOW_ALL);
+        // Set fixed size without browser resizing
+        cc.view.resizeWithBrowserSize(false);
         
-        // Setup the scale mode
-        cc.view.resizeWithBrowserSize(true);
+        // Force canvas size to 1024x1024
+        cc.view.setFrameSize(1024, 1024);
+        
+        // Set design resolution to match canvas size
+        cc.view.setDesignResolutionSize(1024, 1024, cc.ResolutionPolicy.EXACT_FIT);
+        debugLog('Design Resolution set to:', cc.view.getDesignResolutionSize());
+        debugLog('Frame Size:', cc.view.getFrameSize());
+        
+        // Enable anti-aliasing
+        // cc.view.enableAntiAlias(true);
         
         // Load resources
         cc.LoaderScene.preload(g_resources, function() {

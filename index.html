@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Whack-a-Whale</title>
     <link rel="icon" type="image/png" href="resource/whale.png">
-    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1, minimum-scale=1,maximum-scale=1">
+    <meta name="viewport" content="width=1024, height=1024, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="full-screen" content="yes">
     <meta name="screen-orientation" content="portrait">
@@ -23,12 +23,15 @@
             overflow: hidden;
         }
         
-        canvas {
-            background-color: #000;
-        }
-        
         #gameCanvas {
-            margin: 0 auto;
+            width: 1024px !important;
+            height: 1024px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: none !important;
+            max-height: none !important;
+            transform: none !important;
+            background-color: #000;
         }
         
         /* Custom cursor for hammer */
@@ -40,17 +43,6 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <script src="libs/cocos-min.js"></script>
-    <script>
-        window.onload = function() {
-            cc.game.onStart = function() {
-                // Load resources
-                cc.LoaderScene.preload(g_resources, function () {
-                    // Show game scene
-                    cc.director.runScene(new GameScene());
-                }, this);
-            };
-            cc.game.run("gameCanvas");
-        };
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
