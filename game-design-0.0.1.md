@@ -16,4 +16,3 @@
 - Whale stays visible for 2-3 seconds before disappearing
 - Score displayed at top of screen
 - Welcome screen and game over screen
- 
