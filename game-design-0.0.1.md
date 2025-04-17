@@ -16,9 +16,3 @@
 - Whale stays visible for 2-3 seconds before disappearing
 - Score displayed at top of screen
 - Welcome screen and game over screen
-
-## Sound
-- Basic click sound when using hammer
-- Splash sound when hitting whale
-- Start/end game sound effects
-
