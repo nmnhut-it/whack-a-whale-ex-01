@@ -10,7 +10,8 @@ function debugLog(...args) {
 // Resource definitions
 var res = {
     background_png: "resource/background.png",
-    whale_png: "resource/whale.png"
+    whale_png: "resource/whale.png",
+    btn_bg: "resource/btn_bg.png"
 };
 
 // Global resources array
@@ -56,42 +57,6 @@ var HighScores = {
     }
 };
 
-// Create a customized button with background
-function createButton(labelText, fontSize, width, height, posX, posY, bgColor, borderColor) {
-    // Container to hold both background and label
-    var container = new cc.Node();
-    container.setPosition(posX, posY);
-    container.width = width;
-    container.height = height;
-    
-    // Create background
-    var background = new cc.DrawNode();
-    background.drawRect(
-        cc.p(-width/2, -height/2),
-        cc.p(width/2, height/2),
-        bgColor || cc.color(0, 100, 200, 180),
-        2,
-        borderColor || cc.color(0, 150, 250)
-    );
-    container.addChild(background);
-    
-    // Create label
-    var label = new cc.LabelTTF(labelText, "Arial", fontSize);
-    label.setColor(cc.color(255, 255, 255));
-    container.addChild(label);
-    
-    // Store original colors for hover effects
-    container.normalBgColor = bgColor || cc.color(0, 100, 200, 180);
-    container.hoverBgColor = cc.color(
-        Math.min(255, (bgColor?.r || 0) + 30),
-        Math.min(255, (bgColor?.g || 100) + 30),
-        Math.min(255, (bgColor?.b || 200) + 30),
-        bgColor?.a || 180
-    );
-    
-    return container;
-}
-
 // Welcome Scene
 var WelcomeScene = cc.Scene.extend({
     onEnter: function() {
@@ -131,62 +96,73 @@ var WelcomeScene = cc.Scene.extend({
         instructions.setColor(cc.color(255, 255, 255));
         this.addChild(instructions);
         
-        // Create "Start Game" button with our custom function
-        var startButton = createButton(
-            "Start Game", 36, 200, 50, 
-            size.width / 2, size.height * 0.3,
-            cc.color(0, 100, 200, 180),
-            cc.color(0, 150, 250)
-        );
-        this.addChild(startButton);
-        
-        // Create "High Scores" button with our custom function
-        var scoresButton = createButton(
-            "High Scores", 24, 160, 40, 
-            size.width / 2, size.height * 0.2,
-            cc.color(0, 100, 200, 180),
-            cc.color(0, 150, 250)
-        );
-        this.addChild(scoresButton);
-        
-        // Add touch event listeners
-        cc.eventManager.addListener({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            swallowTouches: true,
-            onTouchBegan: function(touch, event) {
-                var location = touch.getLocation();
-                
-                // Check if start button was clicked
-                var startButtonPosition = startButton.getPosition();
-                var startButtonRect = cc.rect(
-                    startButtonPosition.x - startButton.width/2,
-                    startButtonPosition.y - startButton.height/2,
-                    startButton.width,
-                    startButton.height
-                );
-                
-                if (cc.rectContainsPoint(startButtonRect, location)) {
-                    cc.director.runScene(new GameScene());
-                    return true;
-                }
-                
-                // Check if high scores button was clicked
-                var scoresButtonPosition = scoresButton.getPosition();
-                var scoresButtonRect = cc.rect(
-                    scoresButtonPosition.x - scoresButton.width/2,
-                    scoresButtonPosition.y - scoresButton.height/2,
-                    scoresButton.width,
-                    scoresButton.height
-                );
-                
-                if (cc.rectContainsPoint(scoresButtonRect, location)) {
-                    cc.director.runScene(new HighScoreScene());
-                    return true;
-                }
-                
-                return false;
+        // Create "Start Game" button using ccui.Button with proper background
+        var startButton = new ccui.Button(res.btn_bg, res.btn_bg, res.btn_bg, ccui.Widget.LOCAL_TEXTURE);
+        startButton.setTouchEnabled(true);
+        startButton.setScale9Enabled(true);
+        startButton.setCapInsets(cc.rect(1, 1, 1, 1));
+        startButton.setContentSize(cc.size(200, 50));
+        startButton.setPosition(size.width / 2, size.height * 0.3);
+        // startButton.setColor(cc.color(0, 100, 200));
+        startButton.setOpacity(180);
+        startButton.addTouchEventListener(function(sender, type) {
+            if (type === ccui.Widget.TOUCH_ENDED) {
+                cc.director.runScene(new GameScene());
             }
         }, this);
+        
+        // Add border to button
+        // var startBg = new cc.DrawNode();
+        // startBg.drawRect(
+        //     cc.p(-100, -25),
+        //     cc.p(100, 25),
+        //     cc.color(0, 0, 0, 0),  // Transparent fill
+        //     2,
+        //     cc.color(0, 150, 250)  // Border color
+        // );
+        // startButton.addChild(startBg, -1);
+        
+        // Add text label on top of button
+        var startLabel = new cc.LabelTTF("Start Game", "Arial", 36);
+        startLabel.setColor(cc.color(255, 255, 255));
+        startLabel.setPosition(startButton.width/2, startButton.height/2);
+        startButton.addChild(startLabel, 10);
+        
+        this.addChild(startButton);
+        
+        // Create "High Scores" button using ccui.Button with proper background
+        var scoresButton = new ccui.Button(res.btn_bg, res.btn_bg, res.btn_bg, ccui.Widget.LOCAL_TEXTURE);
+        scoresButton.setTouchEnabled(true);
+        scoresButton.setScale9Enabled(true);
+        scoresButton.setCapInsets(cc.rect(1, 1, 1, 1));
+        scoresButton.setContentSize(cc.size(200, 50));
+        scoresButton.setPosition(size.width / 2, size.height * 0.2);
+        // scoresButton.setColor(cc.color(0, 100, 200));
+        scoresButton.setOpacity(180);
+        scoresButton.addTouchEventListener(function(sender, type) {
+            if (type === ccui.Widget.TOUCH_ENDED) {
+                cc.director.runScene(new HighScoreScene());
+            }
+        }, this);
+        
+        // Add border to button
+        var scoresBg = new cc.DrawNode();
+        scoresBg.drawRect(
+            cc.p(-80, -20),
+            cc.p(80, 20),
+            cc.color(0, 0, 0, 0),  // Transparent fill
+            2,
+            cc.color(0, 150, 250)  // Border color
+        );
+        // scoresButton.addChild(scoresBg, -1);
+        
+        // Add text label on top of button
+        var scoresLabel = new cc.LabelTTF("High Scores", "Arial", 24);
+        scoresLabel.setColor(cc.color(255, 255, 255));
+        scoresLabel.setPosition(scoresButton.width/2, scoresButton.height/2);
+        scoresButton.addChild(scoresLabel, 10);
+        
+        this.addChild(scoresButton);
     }
 });
 
@@ -285,10 +261,24 @@ var GameScene = cc.Scene.extend({
             // Hide whale if it's visible
             self.whale.setVisible(false);
             
-            // Random position
-            var x = Math.random() * (size.width - 100) + 50;
-            var y = Math.random() * (size.height - 150) + 50;
-            self.whale.setPosition(x, y);
+            // Well-defined positions (6 holes in a 3x2 grid)
+            var positions = [
+                // Bottom row (from left to right)
+                {x: size.width * 0.15, y: size.height * 0.15},  // Bottom left
+                {x: size.width * 0.5, y: size.height * 0.15},   // Bottom middle
+                {x: size.width * 0.85, y: size.height * 0.15},  // Bottom right
+                
+                // Top row (from left to right)
+                {x: size.width * 0.15, y: size.height * 0.35},  // Top left
+                {x: size.width * 0.5, y: size.height * 0.35},   // Top middle
+                {x: size.width * 0.85, y: size.height * 0.35}   // Top right
+            ];
+            
+            // Select a random position from the defined positions
+            var randomPosition = positions[Math.floor(Math.random() * positions.length)];
+            
+            // Set whale position to the selected hole
+            self.whale.setPosition(randomPosition.x, randomPosition.y);
             
             // Show whale
             self.whale.setVisible(true);
@@ -307,8 +297,7 @@ var GameScene = cc.Scene.extend({
         
         // Schedule regular appearances
         this.whaleAppearInterval = setInterval(makeWhaleAppear, 3000 + Math.random() * 1000);
-    },
-    
+    },   
     onTouch: function(touch, event) {
         if (this.isGameOver) return false;
         
@@ -331,7 +320,7 @@ var GameScene = cc.Scene.extend({
         }
         
         // Missed - deduct points
-        this.score = Math.max(0, this.score - 20);
+        this.score = Math.max(0, this.score - 20);  
         this.scoreLabel.setString("Score: " + this.score);
         
         return true;
@@ -388,62 +377,73 @@ var GameOverScene = cc.Scene.extend({
             this.addChild(highScoreLabel);
         }
         
-        // Create "Play Again" button with our custom function
-        var playAgainButton = createButton(
-            "Play Again", 36, 200, 50, 
-            size.width / 2, size.height * 0.3,
-            cc.color(0, 100, 200, 180),
-            cc.color(0, 150, 250)
-        );
-        this.addChild(playAgainButton);
-        
-        // Create "Main Menu" button with our custom function
-        var menuButton = createButton(
-            "Main Menu", 24, 160, 40, 
-            size.width / 2, size.height * 0.2,
-            cc.color(0, 100, 200, 180),
-            cc.color(0, 150, 250)
-        );
-        this.addChild(menuButton);
-        
-        // Add touch event listeners
-        cc.eventManager.addListener({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            swallowTouches: true,
-            onTouchBegan: function(touch, event) {
-                var location = touch.getLocation();
-                
-                // Check if play again button was clicked
-                var playAgainPosition = playAgainButton.getPosition();
-                var playAgainRect = cc.rect(
-                    playAgainPosition.x - playAgainButton.width/2,
-                    playAgainPosition.y - playAgainButton.height/2,
-                    playAgainButton.width,
-                    playAgainButton.height
-                );
-                
-                if (cc.rectContainsPoint(playAgainRect, location)) {
-                    cc.director.runScene(new GameScene());
-                    return true;
-                }
-                
-                // Check if menu button was clicked
-                var menuPosition = menuButton.getPosition();
-                var menuRect = cc.rect(
-                    menuPosition.x - menuButton.width/2,
-                    menuPosition.y - menuButton.height/2,
-                    menuButton.width,
-                    menuButton.height
-                );
-                
-                if (cc.rectContainsPoint(menuRect, location)) {
-                    cc.director.runScene(new WelcomeScene());
-                    return true;
-                }
-                
-                return false;
+        // Create "Play Again" button using ccui.Button with proper background
+        var playAgainButton = new ccui.Button(res.btn_bg, res.btn_bg, res.btn_bg, ccui.Widget.LOCAL_TEXTURE);
+        playAgainButton.setTouchEnabled(true);
+        playAgainButton.setScale9Enabled(true);
+        playAgainButton.setCapInsets(cc.rect(1, 1, 1, 1));
+        playAgainButton.setContentSize(cc.size(200, 50));
+        playAgainButton.setPosition(size.width / 2, size.height * 0.3);
+        // playAgainButton.setColor(cc.color(0, 100, 200));
+        playAgainButton.setOpacity(180);
+        playAgainButton.addTouchEventListener(function(sender, type) {
+            if (type === ccui.Widget.TOUCH_ENDED) {
+                cc.director.runScene(new GameScene());
             }
         }, this);
+        
+        // Add border to button
+        var playAgainBg = new cc.DrawNode();
+        playAgainBg.drawRect(
+            cc.p(-100, -25),
+            cc.p(100, 25),
+            cc.color(0, 0, 0, 0),  // Transparent fill
+            2,
+            cc.color(0, 150, 250)  // Border color
+        );
+        // playAgainButton.addChild(playAgainBg, -1);
+        
+        // Add text label on top of button
+        var playAgainLabel = new cc.LabelTTF("Play Again", "Arial", 36);
+        playAgainLabel.setColor(cc.color(255, 255, 255));
+        playAgainLabel.setPosition(playAgainButton.width/2, playAgainButton.height/2);
+        playAgainButton.addChild(playAgainLabel, 10);
+        
+        this.addChild(playAgainButton);
+        
+        // Create "Main Menu" button using ccui.Button with proper background
+        var menuButton = new ccui.Button(res.btn_bg, res.btn_bg, res.btn_bg, ccui.Widget.LOCAL_TEXTURE);
+        menuButton.setTouchEnabled(true);
+        menuButton.setScale9Enabled(true);
+        menuButton.setCapInsets(cc.rect(1, 1, 1, 1));
+        menuButton.setContentSize(cc.size(160, 40));
+        menuButton.setPosition(size.width / 2, size.height * 0.2);
+        // menuButton.setColor(cc.color(0, 100, 200));
+        menuButton.setOpacity(180);
+        menuButton.addTouchEventListener(function(sender, type) {
+            if (type === ccui.Widget.TOUCH_ENDED) {
+                cc.director.runScene(new WelcomeScene());
+            }
+        }, this);
+        
+        // Add border to button
+        var menuBg = new cc.DrawNode();
+        menuBg.drawRect(
+            cc.p(-80, -20),
+            cc.p(80, 20),
+            cc.color(0, 0, 0, 0),  // Transparent fill
+            2,
+            cc.color(0, 150, 250)  // Border color
+        );
+        menuButton.addChild(menuBg, -1);
+        
+        // Add text label on top of button
+        var menuLabel = new cc.LabelTTF("Main Menu", "Arial", 24);
+        menuLabel.setColor(cc.color(255, 255, 255));
+        menuLabel.setPosition(menuButton.width/2, menuButton.height/2);
+        menuButton.addChild(menuLabel, 10);
+        
+        this.addChild(menuButton);
     }
 });
 
@@ -493,39 +493,39 @@ var HighScoreScene = cc.Scene.extend({
             }
         }
         
-        // Create "Back to Menu" button with our custom function
-        var backButton = createButton(
-            "Back to Menu", 30, 200, 50, 
-            size.width / 2, size.height * 0.15,
-            cc.color(0, 100, 200, 180),
-            cc.color(0, 150, 250)
-        );
-        this.addChild(backButton);
-        
-        // Add touch event listeners
-        cc.eventManager.addListener({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            swallowTouches: true,
-            onTouchBegan: function(touch, event) {
-                var location = touch.getLocation();
-                
-                // Check if back button was clicked
-                var backPosition = backButton.getPosition();
-                var backRect = cc.rect(
-                    backPosition.x - backButton.width/2,
-                    backPosition.y - backButton.height/2,
-                    backButton.width,
-                    backButton.height
-                );
-                
-                if (cc.rectContainsPoint(backRect, location)) {
-                    cc.director.runScene(new WelcomeScene());
-                    return true;
-                }
-                
-                return false;
+        // Create "Back to Menu" button using ccui.Button with proper background
+        var backButton = new ccui.Button(res.btn_bg, res.btn_bg, res.btn_bg, ccui.Widget.LOCAL_TEXTURE);
+        backButton.setTouchEnabled(true);
+        backButton.setScale9Enabled(true);
+        backButton.setCapInsets(cc.rect(1, 1, 1, 1));
+        backButton.setContentSize(cc.size(200, 50));
+        backButton.setPosition(size.width / 2, size.height * 0.15);
+        // backButton.setColor(cc.color(0, 100, 200));
+        backButton.setOpacity(180);
+        backButton.addTouchEventListener(function(sender, type) {
+            if (type === ccui.Widget.TOUCH_ENDED) {
+                cc.director.runScene(new WelcomeScene());
             }
         }, this);
+        
+        // Add border to button
+        var backBg = new cc.DrawNode();
+        backBg.drawRect(
+            cc.p(-100, -25),
+            cc.p(100, 25),
+            cc.color(0, 0, 0, 0),  // Transparent fill
+            2,
+            cc.color(0, 150, 250)  // Border color
+        );
+        backButton.addChild(backBg, -1);
+        
+        // Add text label on top of button
+        var backLabel = new cc.LabelTTF("Back to Menu", "Arial", 30);
+        backLabel.setColor(cc.color(255, 255, 255));
+        backLabel.setPosition(backButton.width/2, backButton.height/2);
+        backButton.addChild(backLabel, 10);
+        
+        this.addChild(backButton);
     }
 });
 
